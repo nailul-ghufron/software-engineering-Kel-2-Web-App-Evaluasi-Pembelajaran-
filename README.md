@@ -10,21 +10,31 @@ Demo production:
 ## Fitur Utama
 
 - Login JWT dan proteksi endpoint API.
-- Navigasi LMS: brand sidebar klik ke beranda dan tombol logout global.
+- Navigasi LMS dengan sidebar kontekstual: dashboard, buat mata kuliah, input nilai, hasil evaluasi, dan logout global.
 - Dashboard evaluasi data-driven:
   - KPI jumlah mata kuliah, jumlah mahasiswa, rata-rata nilai akhir.
-  - Distribusi nilai huruf (A, B+, B, C+, C, D, E).
-  - Ringkasan status evaluasi per mata kuliah dan daftar MK berisiko.
-- Input nilai batch dengan validasi rentang `0–100`.
+  - Donut chart distribusi nilai huruf (A, B+, B, C+, C, D, E) dengan tooltip interaktif.
+  - Ringkasan status evaluasi per mata kuliah, progress hitung per MK, dan daftar MK berisiko.
+- Input nilai batch dengan validasi rentang `0–100`, sorting kolom NIM/Nama (asc/desc/reset), serta aksi tambah/hapus mahasiswa langsung dari halaman input.
 - Hitung nilai akhir otomatis berbasis bobot tugas/UTS/UAS.
-- Ekspor hasil evaluasi ke file `.xlsx`.
+- Halaman hasil evaluasi khusus per mata kuliah, dilengkapi histogram sebaran nilai akhir dan bar chart distribusi nilai huruf.
+- Ekspor hasil evaluasi ke file `.xlsx` dari halaman hasil evaluasi.
 - Layout responsif mobile (sidebar berubah jadi top nav horizontal, spacing dan kontrol tabel dioptimalkan untuk layar kecil).
+
+## Halaman Frontend
+
+- `/login` - Form login dosen dengan tombol show/hide password.
+- `/` - Dashboard evaluasi (KPI, donut chart distribusi huruf, tabel ringkasan MK, daftar MK berisiko).
+- `/matakuliah/new` - Form tambah mata kuliah.
+- `/matakuliah/:id/edit` - Form edit mata kuliah.
+- `/matakuliah/:id/nilai` - Input nilai (tambah/hapus mahasiswa, validasi nilai, simpan batch, hitung semua).
+- `/matakuliah/:id/hasil` - Hasil evaluasi (histogram nilai akhir, chart distribusi huruf, tabel detail, ekspor Excel).
 
 ## Stack
 
 | Layer | Teknologi |
 |---|---|
-| Frontend | React 18, Vite 5, React Router 6, Axios |
+| Frontend | React 18, Vite 5, React Router 6, Axios, React Icons, Recharts |
 | Backend | Node.js 20+, Express 4, ES Modules |
 | Database | SQLite 3 via `better-sqlite3` |
 | Auth | `jsonwebtoken`, `bcrypt` |
@@ -123,9 +133,9 @@ Semua endpoint selain login membutuhkan header:
 | GET | `/api/matakuliah/:id/mahasiswa` | List mahasiswa per MK |
 | POST | `/api/matakuliah/:id/mahasiswa` | Tambah mahasiswa |
 | DELETE | `/api/mahasiswa/:id` | Hapus mahasiswa + nilai cascade |
-| GET | `/api/matakuliah/:id/nilai` | Ambil data nilai untuk input/hasil |
-| POST | `/api/matakuliah/:id/nilai` | Simpan nilai batch |
-| POST | `/api/matakuliah/:id/hitung` | Hitung semua nilai akhir |
+| GET | `/api/matakuliah/:id/nilai` | Ambil gabungan data mahasiswa + nilai (untuk input & hasil) |
+| POST | `/api/matakuliah/:id/nilai` | Simpan nilai batch (transaksional, validasi jumlah tugas dan rentang nilai) |
+| POST | `/api/matakuliah/:id/hitung` | Hitung ulang rata tugas, nilai akhir, dan huruf untuk semua mahasiswa |
 | GET | `/api/matakuliah/:id/export` | Ekspor Excel |
 
 ## Build Production
