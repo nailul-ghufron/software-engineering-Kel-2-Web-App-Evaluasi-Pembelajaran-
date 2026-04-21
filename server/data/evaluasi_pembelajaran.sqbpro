@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="evaluasi_pembelajaran.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="2561"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="mahasiswa" custom_title="0" dock_id="2" table="4,9:mainmahasiswa"/><dock_state state="000000ff00000000fd00000001000000020000021500000204fc0100000002fb000000160064006f0063006b00420072006f00770073006500310100000000000002150000000000000000fb000000160064006f0063006b00420072006f00770073006500320100000000000002150000011e00ffffff000002150000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 1*">-- Mengaktifkan dukungan Foreign Key di SQLite (Penting untuk dijalankan setiap sesi)
+PRAGMA foreign_keys = ON;
+
+-- 1. Tabel Pengguna (Dosen/Admin)
+CREATE TABLE pengguna (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    nama_lengkap TEXT NOT NULL
+);
+
+-- 2. Tabel Mata Kuliah
+CREATE TABLE mata_kuliah (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    kode_mk TEXT UNIQUE NOT NULL,
+    nama_mk TEXT NOT NULL,
+    bobot_tugas REAL NOT NULL,
+    bobot_uts REAL NOT NULL,
+    bobot_uas REAL NOT NULL,
+    jumlah_tugas INTEGER NOT NULL,
+    pengguna_id INTEGER NOT NULL,
+    FOREIGN KEY (pengguna_id) REFERENCES pengguna (id) ON DELETE CASCADE
+);
+
+-- 3. Tabel Mahasiswa
+CREATE TABLE mahasiswa (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nim TEXT NOT NULL,
+    nama TEXT NOT NULL,
+    mata_kuliah_id INTEGER NOT NULL,
+    FOREIGN KEY (mata_kuliah_id) REFERENCES mata_kuliah (id) ON DELETE CASCADE
+);
+
+-- 4. Tabel Nilai
+CREATE TABLE nilai (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nilai_tugas_json TEXT,           -- Disimpan dalam format array JSON text, misal: &quot;[80, 85, 90]&quot;
+    nilai_uts REAL,
+    nilai_uas REAL,
+    rata_rata_tugas REAL,
+    nilai_akhir REAL,
+    nilai_huruf TEXT,
+    mahasiswa_id INTEGER UNIQUE NOT NULL, -- UNIQUE karena 1 mahasiswa hanya punya 1 record nilai
+    FOREIGN KEY (mahasiswa_id) REFERENCES mahasiswa (id) ON DELETE CASCADE
+);</sql><current_tab id="0"/></tab_sql></sqlb_project>

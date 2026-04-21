@@ -1,0 +1,16 @@
+# Added by code-review-graph
+.code-review-graph/
+.cursor
+.kiro
+.claude
+GEMINI.md
+CLAUDE.md
+.mcp.json
+.opencode.json
+.windsurfrules
+.cursorrules
+AGENTS.md
+client/node_modules
+server/node_modules
+client/.env
+server/.env
