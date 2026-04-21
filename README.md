@@ -1,234 +1,166 @@
 # Web App Evaluasi Pembelajaran
 
-Aplikasi web untuk dosen mengelola mata kuliah, input nilai tugas/UTS/UAS, menghitung nilai akhir dan huruf, serta mengekspor laporan ke Excel.
+Aplikasi LMS evaluasi untuk dosen: mengelola mata kuliah, mahasiswa, input nilai, hitung nilai akhir, melihat dashboard analitik evaluasi, dan ekspor laporan Excel.
+
+## Fitur Utama
+
+- Login JWT dan proteksi endpoint API.
+- Navigasi LMS: brand sidebar klik ke beranda dan tombol logout global.
+- Dashboard evaluasi data-driven:
+  - KPI jumlah mata kuliah, jumlah mahasiswa, rata-rata nilai akhir.
+  - Distribusi nilai huruf (A, B+, B, C+, C, D, E).
+  - Ringkasan status evaluasi per mata kuliah dan daftar MK berisiko.
+- Input nilai batch dengan validasi rentang `0–100`.
+- Hitung nilai akhir otomatis berbasis bobot tugas/UTS/UAS.
+- Ekspor hasil evaluasi ke file `.xlsx`.
 
 ## Stack
 
-| Lapisan | Teknologi |
-
-|---------|-----------|
-
+| Layer | Teknologi |
+|---|---|
 | Frontend | React 18, Vite 5, React Router 6, Axios |
+| Backend | Node.js 20+, Express 4, ES Modules |
+| Database | SQLite 3 via `better-sqlite3` |
+| Auth | `jsonwebtoken`, `bcrypt` |
+| Export | `exceljs` |
 
-| Backend | Node.js 20+, Express 4, ES modules |
+## Struktur Folder
 
-| Database | SQLite 3 lewat `better-sqlite3` |
-
-| Auth | JWT `jsonwebtoken`), bcrypt |
-
-| Excel | ExcelJS 4 |
-
-## Struktur repositori
-
-```
-
-├── client/                 # SPA React + Vite
-
+```text
+.
+├── client/
 │   ├── src/
-
-│   │   ├── pages/          # Login, Dashboard, Form MK, Input Nilai, Hasil
-
-│   │   ├── components/     # Sidebar, NilaiTable, ExportButton
-
-│   │   └── services/api.js # Pemanggilan API + JWT
-
-│   └── vite.config.js      # Proxy /api → backend
-
-├── server/                 # REST API Express
-
+│   │   ├── pages/
+│   │   ├── components/
+│   │   └── services/api.js
+│   ├── vite.config.js
+│   ├── .env.example
+│   └── vercel.json
+├── server/
 │   ├── server.js
-
 │   ├── db.js
-
-│   ├── middleware/auth.js
-
-│   ├── routes/             # auth, matakuliah, mahasiswa, nilai, export
-
-│   └── services/           # kalkulasi.js, export.js (Excel)
-
-└── docs/                   # Dokumen desain (opsional)
-
+│   ├── middleware/
+│   ├── routes/
+│   ├── services/
+│   └── .env.example
+└── README.md
 ```
 
-Database file default: `server/data/evaluasi_pembelajaran.db` (dibuat otomatis).
+Default database: `server/data/evaluasi_pembelajaran.db`.
 
-## Prasyarat
+## Environment Variables
 
-- Node.js **20 LTS** atau lebih baru
+### Backend (`server/.env`)
 
-- npm (disertai Node)
+| Key | Contoh | Keterangan |
+|---|---|---|
+| `PORT` | `3000` | Port backend |
+| `JWT_SECRET` | `super-secret-key` | Secret JWT |
+| `DB_PATH` | `./data/evaluasi_pembelajaran.db` | Lokasi file SQLite |
+| `CORS_ORIGIN` | `http://localhost:5173,http://127.0.0.1:5173` | Origin frontend yang diizinkan |
 
-## Setup lokal
+### Frontend (`client/.env`)
 
-### 1. Variabel lingkungan backend
+| Key | Contoh | Keterangan |
+|---|---|---|
+| `VITE_API_URL` | `https://api.domain-anda.com/api` | Base URL API production (opsional saat dev) |
 
-Salin `server/.env.example` menjadi `server/.env` dan sesuaikan:
+## Menjalankan Lokal
 
-| Variabel | Contoh | Keterangan |
-
-|----------|--------|------------|
-
-| `PORT` | `3000` | Port API |
-
-| `JWT_SECRET` | string panjang acak | Kunci penandatanganan JWT |
-
-| `DB_PATH` | `./data/evaluasi_pembelajaran.db` | Path file SQLite (relatif ke folder `server/` atau absolut) |
-
-| `CORS_ORIGIN` | `http://localhost:5173,...` | Daftar origin yang diizinkan browser, dipisah koma (opsional) |
-
-Tanpa `.env`, server memakai default `PORT=3000`, `JWT_SECRET` pengembangan **hanya untuk dev**).
-
-### 2. Instal dependensi
+1. Install dependencies:
 
 ```bash
-
 cd server && npm install
-
 cd ../client && npm install
-
 ```
 
-### 3. Menjalankan pengembangan
-
-Terminal 1 (API):
+2. Jalankan backend:
 
 ```bash
-
 cd server
-
 npm run dev
-
 ```
 
-Terminal 2 (Vite, proxy `/api` ke `http://localhost:3000`):
+3. Jalankan frontend:
 
 ```bash
-
 cd client
-
 npm run dev
-
 ```
 
-Buka browser: `http://localhost:5173`
+4. Buka `http://localhost:5173`
 
-Login seed default:
+Login default seed:
 
-- **Username:** `dosen`
+- Username: `dosen`
+- Password: `password123`
 
-- **Password:** `password123`
+## Ringkasan Endpoint API
 
-### 4. Build produksi (frontend)
+Semua endpoint selain login membutuhkan header:
+`Authorization: Bearer <token>`
+
+| Method | Endpoint | Deskripsi |
+|---|---|---|
+| POST | `/api/auth/login` | Login dosen |
+| GET | `/api/matakuliah` | List mata kuliah user |
+| GET | `/api/matakuliah/dashboard/summary` | Data analitik dashboard evaluasi |
+| POST | `/api/matakuliah` | Tambah mata kuliah |
+| PUT | `/api/matakuliah/:id` | Edit mata kuliah |
+| DELETE | `/api/matakuliah/:id` | Hapus mata kuliah (ditolak bila ada nilai) |
+| GET | `/api/matakuliah/:id/mahasiswa` | List mahasiswa per MK |
+| POST | `/api/matakuliah/:id/mahasiswa` | Tambah mahasiswa |
+| DELETE | `/api/mahasiswa/:id` | Hapus mahasiswa + nilai cascade |
+| GET | `/api/matakuliah/:id/nilai` | Ambil data nilai untuk input/hasil |
+| POST | `/api/matakuliah/:id/nilai` | Simpan nilai batch |
+| POST | `/api/matakuliah/:id/hitung` | Hitung semua nilai akhir |
+| GET | `/api/matakuliah/:id/export` | Ekspor Excel |
+
+## Build Production
+
+Frontend build:
 
 ```bash
-
 cd client
-
 npm run build
-
 ```
 
-Output statis ada di `client/dist/`.
-
-## Ringkasan API
-
-Semua endpoint kecuali `POST /api/auth/login` membutuhkan header:
-
-`Authorization: Bearer <JWT>`
-
-| Metode | Path | Fungsi |
-
-|--------|------|--------|
-
-| POST | `/api/auth/login` | Body: `{ username, password }` → `{ token, user }` |
-
-| GET | `/api/matakuliah` | Daftar MK milik user login |
-
-| POST | `/api/matakuliah` | Buat MK (bobot desimal, jumlah `jumlah_tugas`) |
-
-| PUT | `/api/matakuliah/:id` | Update MK |
-
-| DELETE | `/api/matakuliah/:id` | Hapus MK (gagal jika sudah ada data `nilai`) |
-
-| GET | `/api/matakuliah/:id/mahasiswa` | Daftar mahasiswa |
-
-| POST | `/api/matakuliah/:id/mahasiswa` | Tambah mahasiswa `{ nim, nama }` |
-
-| DELETE | `/api/mahasiswa/:id` | Hapus mahasiswa + nilai (cascade) |
-
-| GET | `/api/matakuliah/:id/nilai` | Gabungan mahasiswa + nilai untuk UI |
-
-| POST | `/api/matakuliah/:id/nilai` | Simpan batch `{ items: [...] }` |
-
-| POST | `/api/matakuliah/:id/hitung` | Hitung rata tugas, nilai akhir, huruf |
-
-| GET | `/api/matakuliah/:id/export` | Unduh `.xlsx` |
-
-Contoh login:
-
-```bash
-
-curl -s -X POST [http://localhost:3000/api/auth/login](http://localhost:3000/api/auth/login) \
-
-  -H "Content-Type: application/json" \
-
-  -d "{\"username\":\"dosen\",\"password\":\"password123\"}"
-
-```
+Output: `client/dist`
 
 ## Deployment
 
-### Pola yang disarankan
+### Rekomendasi Arsitektur
 
-- **Frontend:** hosting statis (Vercel, Netlify, GitHub Pages, CDN).
+- Frontend: static hosting (Vercel, Netlify, GitHub Pages).
+- Backend: Node service dengan persistent disk (Render/Railway/Fly/VM).
+- SQLite tidak cocok untuk banyak instance serverless write-heavy.
 
-- **Backend:** mesin **tunggal** atau VPS/container dengan sistem file persisten untuk SQLite (Render, [Fly.io](http://Fly.io), Railway, VM). SQLite **tidak cocok** untuk banyak instance serverless yang menulis ke satu file secara bersamaan.
+### Deploy Frontend ke Vercel
 
-### Vercel — frontend (Vite SPA)
+1. Import repo ke Vercel.
+2. Set Root Directory: `client`.
+3. Build command: `npm run build`.
+4. Output: `dist`.
+5. Set env `VITE_API_URL` jika API dipisah domain.
 
-1. Root proyek → impor repo di Vercel; set **Root Directory** ke `client`.
+`client/vercel.json` sudah disiapkan agar SPA route tidak 404.
 
-2. **Build command:** `npm run build`
+### Deploy Frontend ke GitHub Pages
 
-3. **Output directory:** `dist`
+1. Set `base` pada `vite.config.js` jika deploy di subpath repo.
+2. Build `client`.
+3. Publish `client/dist` via GitHub Actions.
+4. Pastikan `VITE_API_URL` mengarah ke backend publik.
 
-4. Tambahkan Environment variable `VITE_API_URL` jika API tidak diproxy (lihat poin CORS).
+### Deploy Backend
 
-5. Tambahkan file `client/vercel.json` agar rute SPA tidak 404:
+- Jalankan service Node dari folder `server`.
+- Pastikan env `PORT`, `JWT_SECRET`, `DB_PATH`, `CORS_ORIGIN` terpasang.
+- Gunakan persistent storage untuk file SQLite.
 
-```json
+## Catatan Operasional
 
-{
-
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
-
-}
-
-```
-
-Jika API di domain lain: di build production set `VITE_API_URL` ke **basis URL API termasuk prefix `/api`**, contoh: `https://api.domain-anda.com/api`. Tanpa variabel ini, klien memakai `/api` (cocok dengan proxy Vite saat `npm run dev`).
-
-Backend di Vercel: untuk Express + SQLite **persisten**, umumnya membutuhkan arsitektur khusus (misalnya backend terpisah di non-serverless). Alternatif: jadikan backend satu layanan Node di Render/Railway dengan variabel `PORT` dan volume disk untuk `DB_PATH`.
-
-### GitHub Pages — frontend statis
-
-1. `client/vite.config.js`: set `base` ke nama repo jika dihost di subpath, misalnya `base: '/nama-repo/'`.
-
-2. Build: `npm run build` di dalam `client/`.
-
-3. Deploy isi folder `client/dist` (misalnya Actions dengan `peaceiris/actions-gh-pages`).
-
-GitHub Pages **hanya** melayani file statis; API harus berjalan di **host terpisah**. Setelah deploy, arahkan frontend ke URL API (environment + axios `baseURL`).
-
-### CORS backend
-
-`server/server.js` mengizinkan asal `http://localhost:5173`. Untuk produksi, tambahkan origin frontend ke daftar `cors` (atau variabel env berisi daftar origin yang diizinkan).
-
-## Pengujian singkat alur API
-
-Setelah `npm run dev` di `server`, gunakan JWT dari login untuk memanggil endpoint terlindungi; uji ekspor Excel dengan klien HTTP yang menyimpan body biner ke file `.xlsx`.
-
-## Lisensi / akademik
-
-Proyek ini ditujukan untuk keperluan pengembangan dan dokumentasi mata kuliah rekayasa perangkat lunak.
+- Jika endpoint baru belum terdeteksi saat dev, restart proses backend `npm run dev`.
+- Untuk environment production, wajib ganti `JWT_SECRET`.
+- Pantau ukuran DB dan backup berkala file SQLite.
 

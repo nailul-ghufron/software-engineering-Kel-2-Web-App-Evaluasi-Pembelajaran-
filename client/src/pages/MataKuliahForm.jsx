@@ -17,6 +17,7 @@ export default function MataKuliahForm() {
   const [jt, setJt] = useState(1);
   const [err, setErr] = useState("");
   const [loading, setL] = useState(false);
+  const [existingJt, setExistingJt] = useState(null);
 
   const totalPct = useMemo(() => {
     const a = Number(bt);
@@ -45,6 +46,7 @@ export default function MataKuliahForm() {
         setBu(String(Math.round(mk.bobot_uts * 10000) / 100));
         setBa(String(Math.round(mk.bobot_uas * 10000) / 100));
         setJt(mk.jumlah_tugas);
+        setExistingJt(mk.jumlah_tugas);
       } catch {
         setErr("Gagal memuat mata kuliah.");
       } finally {
@@ -66,7 +68,7 @@ export default function MataKuliahForm() {
       bobot_tugas: Number(bt) / 100,
       bobot_uts: Number(bu) / 100,
       bobot_uas: Number(ba) / 100,
-      jumlah_tugas: Number(jt),
+      jumlah_tugas: isEdit ? Number(existingJt ?? jt) : Number(jt),
     };
     setL(true);
     try {

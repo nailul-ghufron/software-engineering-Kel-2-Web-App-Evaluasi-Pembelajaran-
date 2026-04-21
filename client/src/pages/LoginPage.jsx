@@ -38,15 +38,15 @@ export default function LoginPage() {
     >
       <div className="card" style={{ width: "100%", maxWidth: 430, borderRadius: "24px", padding: "2.2rem" }}>
         <p className="hint" style={{ margin: 0, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-          The Scholarly Sanctuary
+          Web App Evaluasi Pembelajaran
         </p>
         <h1 style={{ marginTop: "0.35rem", marginBottom: "0.35rem", fontSize: "2rem", lineHeight: 1.05 }}>
-          Masuk ke
+          Masuk ke Aplikasi
           <br />
-          Dashboard Dosen
+          Evaluasi Pembelajaran
         </h1>
         <p className="hint" style={{ marginBottom: "1.5rem", fontSize: "0.9rem" }}>
-          Kelola evaluasi pembelajaran dengan workspace yang lebih fokus dan terstruktur.
+          Kelola mata kuliah, nilai, dan hasil evaluasi pembelajaran dalam satu platform.
         </p>
         <form onSubmit={submit}>
           <div className="field">

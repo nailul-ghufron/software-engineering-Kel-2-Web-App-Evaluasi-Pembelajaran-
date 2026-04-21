@@ -156,6 +156,8 @@ export default function InputNilaiPage() {
     }
   }
 
+  const terisi = items.filter((x) => x.nilai_akhir != null).length;
+
   if (loading && !mk) {
     return (
       <div className="layout">
@@ -202,6 +204,23 @@ export default function InputNilaiPage() {
           </div>
         </div>
 
+        {!loading && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: "0.65rem", marginBottom: "0.9rem" }}>
+            <div className="card" style={{ padding: "0.8rem 1rem" }}>
+              <div className="hint">Total Mahasiswa</div>
+              <strong style={{ fontSize: "1.25rem" }}>{items.length}</strong>
+            </div>
+            <div className="card" style={{ padding: "0.8rem 1rem" }}>
+              <div className="hint">Sudah Dihitung</div>
+              <strong style={{ fontSize: "1.25rem" }}>{terisi}</strong>
+            </div>
+            <div className="card" style={{ padding: "0.8rem 1rem" }}>
+              <div className="hint">Progress</div>
+              <strong style={{ fontSize: "1.25rem" }}>{items.length ? Math.round((terisi / items.length) * 100) : 0}%</strong>
+            </div>
+          </div>
+        )}
+
         {msg && (
           <div
             style={{
@@ -238,13 +257,19 @@ export default function InputNilaiPage() {
         )}
 
         <div style={{ marginTop: "1rem" }}>
-          <NilaiTable
-            mk={mk}
-            items={items}
-            errors={errors}
-            onCellChange={onCellChange}
-            onDeleteRow={hapus}
-          />
+          {items.length === 0 ? (
+            <div className="card-soft">
+              Belum ada mahasiswa pada mata kuliah ini. Tambahkan mahasiswa dulu sebelum input nilai.
+            </div>
+          ) : (
+            <NilaiTable
+              mk={mk}
+              items={items}
+              errors={errors}
+              onCellChange={onCellChange}
+              onDeleteRow={hapus}
+            />
+          )}
         </div>
       </div>
     </div>

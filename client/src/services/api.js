@@ -35,6 +35,11 @@ export async function fetchMataKuliah() {
   return data;
 }
 
+export async function fetchDashboardSummary() {
+  const { data } = await api.get("/matakuliah/dashboard/summary");
+  return data;
+}
+
 export async function createMataKuliah(body) {
   const { data } = await api.post("/matakuliah", body);
   return data;

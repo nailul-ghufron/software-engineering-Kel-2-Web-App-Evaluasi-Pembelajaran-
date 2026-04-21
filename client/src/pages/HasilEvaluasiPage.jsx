@@ -41,6 +41,13 @@ export default function HasilEvaluasiPage() {
   }
 
   const pct = (b) => (b == null ? "—" : `${Math.round(Number(b) * 100)}%`);
+  const rataKelas =
+    items.length === 0
+      ? null
+      : items
+          .map((x) => x.nilai_akhir)
+          .filter((x) => x != null)
+          .reduce((a, b, _, arr) => a + Number(b) / arr.length, 0);
 
   return (
     <div className="layout">
@@ -66,6 +73,11 @@ export default function HasilEvaluasiPage() {
         </div>
 
         <div style={{ marginTop: "1rem" }} className="card-soft">
+          {rataKelas != null && (
+            <div className="hint" style={{ marginBottom: "0.65rem" }}>
+              Rata-rata nilai akhir kelas: <strong style={{ color: "var(--text)" }}>{rataKelas.toFixed(2)}</strong>
+            </div>
+          )}
           {loading ? (
             <p style={{ padding: "1rem" }}>Memuat…</p>
           ) : (
