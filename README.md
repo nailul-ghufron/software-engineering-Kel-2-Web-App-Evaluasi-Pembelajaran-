@@ -181,3 +181,83 @@ npx vercel deploy --prod
 - Untuk environment production, wajib ganti `JWT_SECRET`.
 - Pantau ukuran DB dan backup berkala file SQLite.
 
+## 👥 Team & Contributors
+
+<div align="center">
+
+### 🏆 **Core Team**
+
+<table>
+<tr>
+<td align="center">
+<img src="https://github.com/Sadamdi.png" width="100px" alt="Sulthan Adam Rahmadi"/>
+<br />
+<strong>Sulthan Adam Rahmadi</strong>
+<br />
+<sub>🚀 <strong>Project Manager</strong></sub>
+<br />
+<sub>
+📋 Project Manager<br/>
+💻 Frontend Developer<br/>
+⚙️ Backend Developer<br/>
+</sub>
+<br />
+<a href="https://github.com/Sadamdi">GitHub</a>
+</td>
+
+<td align="center">
+<img src="https://github.com/nailul-ghufron.png" width="100px" alt="Nailul Ghufron"/>
+<br />
+<strong>Nailul Ghufron</strong>
+<br />
+<sub>🧠 <strong>Project Initialization & Database</strong></sub>
+<br />
+<sub>
+🛠️ Project Inisialisasi<br/>
+🗃️ Database Design<br/>
+</sub>
+<br />
+<a href="https://github.com/nailul-ghufron">GitHub</a>
+</td>
+</tr>
+
+<tr>
+<td align="center">
+<img src="https://ui-avatars.com/api/?name=Irfan+Satya+Abinaya&background=EAF0F5&color=2C3436&bold=true" width="100px" alt="Irfan Satya Abinaya"/>
+<br />
+<strong>Irfan Satya Abinaya</strong>
+<br />
+<sub>🎨 <strong>UI/UX Designer</strong></sub>
+<br />
+<sub>
+🧩 UI Designer<br/>
+✨ UX Designer<br/>
+</sub>
+</td>
+
+<td align="center">
+<img src="https://github.com/rahmatrafii.png" width="100px" alt="Rahmat Rafi Indrayani"/>
+<br />
+<strong>Rahmat Rafi Indrayani</strong>
+<br />
+<sub>🖌️ <strong>UI/UX Implementation & Frontend</strong></sub>
+<br />
+<sub>
+🎯 UI/UX Implementation<br/>
+💻 Frontend Developer<br/>
+</sub>
+<br />
+<a href="https://github.com/rahmatrafii">GitHub</a>
+</td>
+</tr>
+</table>
+
+</div>
+
+## 📄 License
+
+Project ini dilisensikan di bawah **MIT License** dengan pemegang hak cipta:
+**Software Engineer Kel 2**.
+
+Lihat detail lisensi pada file `LICENSE`.
+
