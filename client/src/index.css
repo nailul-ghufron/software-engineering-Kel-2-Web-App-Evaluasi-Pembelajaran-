@@ -262,3 +262,158 @@ tbody tr td:last-child {
   line-height: 1;
   letter-spacing: -0.04em;
 }
+
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: var(--surface-low);
+  padding: 2rem 1.2rem;
+  flex-shrink: 0;
+}
+
+.sidebar-brand {
+  display: block;
+  margin-bottom: 2rem;
+  text-decoration: none;
+}
+
+.sidebar-brand-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sidebar-brand-title {
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin-top: 0.25rem;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.sidebar-section-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-top: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.sidebar-actions {
+  margin-top: 1.5rem;
+}
+
+.nilai-input {
+  width: 88px;
+  padding: 0.52rem 0.55rem;
+  border-radius: 10px;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--outline);
+  }
+
+  .sidebar-brand {
+    margin-bottom: 0.8rem;
+  }
+
+  .sidebar-brand-title br {
+    display: none;
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .sidebar-section-label {
+    margin: 0 0.2rem 0 0.5rem;
+    white-space: nowrap;
+    align-self: center;
+  }
+
+  .sidebar-actions {
+    margin-top: 0.8rem;
+  }
+
+  .main {
+    padding: 1rem 0.9rem 1.6rem;
+  }
+
+  .card,
+  .card-soft {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.6rem;
+  }
+
+  .editorial-header {
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+
+  th,
+  td {
+    padding: 0.6rem 0.65rem;
+    font-size: 0.82rem;
+  }
+
+  .btn {
+    padding: 0.58rem 0.85rem;
+    font-size: 0.8rem;
+  }
+
+  .nilai-input {
+    width: 72px;
+    padding: 0.44rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .page-title {
+    font-size: 1.35rem;
+  }
+
+  .main {
+    padding: 0.85rem 0.7rem 1.2rem;
+  }
+
+  .stat-pill {
+    padding: 0.75rem 0.9rem;
+  }
+
+  .stat-pill strong {
+    font-size: 1.5rem;
+  }
+
+  .sidebar-brand-title {
+    font-size: 1rem;
+  }
+
+  .field input {
+    padding: 0.64rem 0.72rem;
+  }
+}

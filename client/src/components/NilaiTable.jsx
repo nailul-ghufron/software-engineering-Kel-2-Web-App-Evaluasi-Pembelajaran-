@@ -27,6 +27,7 @@ export default function NilaiTable({ mk, items, errors, onCellChange, onDeleteRo
                 return (
                   <td key={ti}>
                     <input
+                      className="nilai-input"
                       type="number"
                       min={0}
                       max={100}
@@ -36,9 +37,6 @@ export default function NilaiTable({ mk, items, errors, onCellChange, onDeleteRo
                         onCellChange(ri, "tugas", ti, e.target.value === "" ? "" : Number(e.target.value))
                       }
                       style={{
-                        width: 88,
-                        padding: "0.52rem 0.55rem",
-                        borderRadius: 10,
                         border: errors[keyT] ? "1px solid var(--danger)" : "1px solid var(--outline)",
                         background: "var(--surface-low)",
                         color: "var(--text)",
@@ -54,6 +52,7 @@ export default function NilaiTable({ mk, items, errors, onCellChange, onDeleteRo
               })}
               <td>
                 <input
+                  className="nilai-input"
                   type="number"
                   min={0}
                   max={100}
@@ -70,9 +69,6 @@ export default function NilaiTable({ mk, items, errors, onCellChange, onDeleteRo
                     )
                   }
                   style={{
-                    width: 88,
-                    padding: "0.52rem 0.55rem",
-                    borderRadius: 10,
                     border: errors[`${ri}-uts`]
                       ? "1px solid var(--danger)"
                       : "1px solid var(--outline)",
@@ -88,6 +84,7 @@ export default function NilaiTable({ mk, items, errors, onCellChange, onDeleteRo
               </td>
               <td>
                 <input
+                  className="nilai-input"
                   type="number"
                   min={0}
                   max={100}
@@ -104,9 +101,6 @@ export default function NilaiTable({ mk, items, errors, onCellChange, onDeleteRo
                     )
                   }
                   style={{
-                    width: 88,
-                    padding: "0.52rem 0.55rem",
-                    borderRadius: 10,
                     border: errors[`${ri}-uas`]
                       ? "1px solid var(--danger)"
                       : "1px solid var(--outline)",

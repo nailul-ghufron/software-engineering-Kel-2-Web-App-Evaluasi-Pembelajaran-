@@ -2,6 +2,11 @@
 
 Aplikasi LMS evaluasi untuk dosen: mengelola mata kuliah, mahasiswa, input nilai, hitung nilai akhir, melihat dashboard analitik evaluasi, dan ekspor laporan Excel.
 
+Demo production:
+
+- Frontend: `https://evaluasi-pembelajaran-client.vercel.app`
+- Fullstack app (frontend + API): `https://evaluasi-pembelajaran-app.vercel.app`
+
 ## Fitur Utama
 
 - Login JWT dan proteksi endpoint API.
@@ -13,6 +18,7 @@ Aplikasi LMS evaluasi untuk dosen: mengelola mata kuliah, mahasiswa, input nilai
 - Input nilai batch dengan validasi rentang `0–100`.
 - Hitung nilai akhir otomatis berbasis bobot tugas/UTS/UAS.
 - Ekspor hasil evaluasi ke file `.xlsx`.
+- Layout responsif mobile (sidebar berubah jadi top nav horizontal, spacing dan kontrol tabel dioptimalkan untuk layar kecil).
 
 ## Stack
 
@@ -28,6 +34,8 @@ Aplikasi LMS evaluasi untuk dosen: mengelola mata kuliah, mahasiswa, input nilai
 
 ```text
 .
+├── api/
+│   └── index.js
 ├── client/
 │   ├── src/
 │   │   ├── pages/
@@ -37,12 +45,14 @@ Aplikasi LMS evaluasi untuk dosen: mengelola mata kuliah, mahasiswa, input nilai
 │   ├── .env.example
 │   └── vercel.json
 ├── server/
+│   ├── app.js
 │   ├── server.js
 │   ├── db.js
 │   ├── middleware/
 │   ├── routes/
 │   ├── services/
 │   └── .env.example
+├── vercel.json
 └── README.md
 ```
 
@@ -64,6 +74,8 @@ Default database: `server/data/evaluasi_pembelajaran.db`.
 | Key | Contoh | Keterangan |
 |---|---|---|
 | `VITE_API_URL` | `https://api.domain-anda.com/api` | Base URL API production (opsional saat dev) |
+
+Catatan: pada build production, jika `VITE_API_URL` masih menunjuk `localhost`, frontend otomatis fallback ke `/api` agar tidak terkena CORS.
 
 ## Menjalankan Lokal
 
@@ -129,34 +141,39 @@ Output: `client/dist`
 
 ## Deployment
 
-### Rekomendasi Arsitektur
+### Opsi 1: Fullstack dalam 1 Project Vercel (direkomendasikan untuk repo ini)
 
-- Frontend: static hosting (Vercel, Netlify, GitHub Pages).
-- Backend: Node service dengan persistent disk (Render/Railway/Fly/VM).
-- SQLite tidak cocok untuk banyak instance serverless write-heavy.
+Konfigurasi root sudah tersedia:
 
-### Deploy Frontend ke Vercel
+- `vercel.json` me-rewrite `/api/*` ke `api/index.js`.
+- `api/index.js` menjalankan Express app dari `server/app.js`.
+- `buildCommand` root membangun frontend `client/dist`.
 
-1. Import repo ke Vercel.
-2. Set Root Directory: `client`.
-3. Build command: `npm run build`.
-4. Output: `dist`.
-5. Set env `VITE_API_URL` jika API dipisah domain.
+Deploy:
 
-`client/vercel.json` sudah disiapkan agar SPA route tidak 404.
+```bash
+npx vercel deploy --prod
+```
 
-### Deploy Frontend ke GitHub Pages
+### Opsi 2: Frontend-only Project (`client`)
 
-1. Set `base` pada `vite.config.js` jika deploy di subpath repo.
-2. Build `client`.
-3. Publish `client/dist` via GitHub Actions.
-4. Pastikan `VITE_API_URL` mengarah ke backend publik.
+Project `client` punya `client/vercel.json` yang:
 
-### Deploy Backend
+- menangani SPA fallback ke `index.html`
+- mem-proxy `/api/*` ke domain backend `evaluasi-pembelajaran-app`
 
-- Jalankan service Node dari folder `server`.
-- Pastikan env `PORT`, `JWT_SECRET`, `DB_PATH`, `CORS_ORIGIN` terpasang.
-- Gunakan persistent storage untuk file SQLite.
+Deploy:
+
+```bash
+cd client
+npx vercel deploy --prod
+```
+
+### Catatan SQLite di Serverless
+
+- Untuk runtime Vercel serverless, DB akan berjalan di path sementara (`/tmp`).
+- Data tidak cocok untuk write-heavy/persistensi jangka panjang.
+- Untuk produksi serius, pertimbangkan migrasi ke database managed (Postgres/MySQL).
 
 ## Catatan Operasional
 

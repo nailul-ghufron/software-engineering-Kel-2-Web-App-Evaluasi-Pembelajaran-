@@ -12,41 +12,25 @@ export default function Sidebar({ mkId, kodeMk }) {
   }
 
   return (
-    <aside
-      style={{
-        width: 260,
-        minHeight: "100vh",
-        background: "var(--surface-low)",
-        padding: "2rem 1.2rem",
-      }}
-    >
-      <Link to="/" style={{ display: "block", marginBottom: "2rem", textDecoration: "none" }}>
-        <div style={{ fontSize: "0.72rem", color: "var(--muted)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+    <aside className="sidebar">
+      <Link to="/" className="sidebar-brand">
+        <div className="sidebar-brand-label">
           Workspace
         </div>
-        <div style={{ fontWeight: 800, fontSize: "1.1rem", marginTop: "0.25rem", lineHeight: 1.2, color: "var(--text)" }}>
+        <div className="sidebar-brand-title">
           Evaluasi
           <br />
           Pembelajaran
         </div>
       </Link>
-      <nav style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
+      <nav className="sidebar-nav">
         <SidebarLink to="/" end>
           Dashboard
         </SidebarLink>
         <SidebarLink to="/matakuliah/new">Buat mata kuliah</SidebarLink>
         {mkBase && kodeMk && (
           <>
-            <div
-              style={{
-                fontSize: "0.72rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.06em",
-                color: "var(--muted)",
-                marginTop: "1rem",
-                marginBottom: "0.2rem",
-              }}
-            >
+            <div className="sidebar-section-label">
               {kodeMk}
             </div>
             <SidebarLink to={`${mkBase}/nilai`}>Input nilai</SidebarLink>
@@ -54,7 +38,7 @@ export default function Sidebar({ mkId, kodeMk }) {
           </>
         )}
       </nav>
-      <div style={{ marginTop: "1.5rem" }}>
+      <div className="sidebar-actions">
         <button type="button" className="btn btn-ghost" style={{ width: "100%" }} onClick={handleLogout}>
           Logout
         </button>

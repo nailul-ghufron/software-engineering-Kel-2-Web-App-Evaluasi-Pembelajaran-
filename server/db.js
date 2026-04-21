@@ -10,6 +10,8 @@ const DB_PATH = process.env.DB_PATH
   ? path.isAbsolute(process.env.DB_PATH)
     ? process.env.DB_PATH
     : path.resolve(__dirname, process.env.DB_PATH)
+  : process.env.VERCEL
+    ? "/tmp/evaluasi_pembelajaran.db"
   : path.join(__dirname, "data", "evaluasi_pembelajaran.db");
 
 fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });

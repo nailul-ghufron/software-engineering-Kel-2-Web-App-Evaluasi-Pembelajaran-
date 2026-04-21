@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const baseURL = (import.meta.env.VITE_API_URL && String(import.meta.env.VITE_API_URL).trim()) || "/api";
+const configuredApiUrl = import.meta.env.VITE_API_URL && String(import.meta.env.VITE_API_URL).trim();
+const isLocalhostApi =
+  !!configuredApiUrl && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/i.test(configuredApiUrl);
+const baseURL = import.meta.env.PROD && isLocalhostApi ? "/api" : configuredApiUrl || "/api";
 const api = axios.create({ baseURL });
 
 /** Menyematkan JWT pada setiap permintaan REST dan menormalisasi respons 401 ke alur login. */
