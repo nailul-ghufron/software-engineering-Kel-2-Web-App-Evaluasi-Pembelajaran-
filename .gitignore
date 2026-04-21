@@ -12,6 +12,9 @@ CLAUDE.md
 AGENTS.md
 client/node_modules
 server/node_modules
+client/.vite
+client/dist
+client/node_modules/.vite
 client/.env
 server/.env
 .vercel

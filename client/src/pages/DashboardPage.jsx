@@ -1,5 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import {
+  FiActivity,
+  FiAward,
+  FiBookOpen,
+  FiEdit2,
+  FiHash,
+  FiPercent,
+  FiSettings,
+  FiTrash2,
+  FiType,
+  FiUsers,
+} from "react-icons/fi";
 import Sidebar from "../components/Sidebar.jsx";
 import { deleteMataKuliah, fetchDashboardSummary, fetchMataKuliah } from "../services/api.js";
 
@@ -9,6 +21,8 @@ export default function DashboardPage() {
   const [summary, setSummary] = useState(null);
   const [loading, setL] = useState(true);
   const [msg, setMsg] = useState("");
+  const [hoverInfo, setHoverInfo] = useState(null);
+  const [chartProgress, setChartProgress] = useState(0);
 
   /** Mengambil data dashboard dan ringkasan evaluasi dalam satu siklus refresh UI. */
   async function load() {
@@ -47,6 +61,108 @@ export default function DashboardPage() {
     return "Belum ada mhs";
   }
 
+  const distribusiEntries = Object.entries(summary?.distribusi_huruf || {});
+  const distribusiTotal = distribusiEntries.reduce((acc, [, nilai]) => acc + Number(nilai || 0), 0);
+  const donutColors = ["#0b5ed7", "#6f42c1", "#198754", "#fd7e14", "#dc3545", "#20c997", "#212529"];
+
+  let offsetPercent = 0;
+  const donutSegments = distribusiEntries.map(([huruf, jumlah], index) => {
+    const value = Number(jumlah || 0);
+    const percent = distribusiTotal > 0 ? (value / distribusiTotal) * 100 : 0;
+    const start = offsetPercent;
+    const end = offsetPercent + percent;
+    offsetPercent = end;
+    return {
+      huruf,
+      value,
+      percent,
+      start,
+      end,
+      color: donutColors[index % donutColors.length],
+    };
+  });
+
+  useEffect(() => {
+    if (loading) return;
+    setChartProgress(0);
+
+    const durationMs = 850;
+    const startTime = performance.now();
+    let rafId = 0;
+
+    const tick = (now) => {
+      const elapsed = now - startTime;
+      const raw = Math.min(elapsed / durationMs, 1);
+      const eased = 1 - Math.pow(1 - raw, 3);
+      setChartProgress(eased);
+      if (raw < 1) rafId = window.requestAnimationFrame(tick);
+    };
+
+    rafId = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(rafId);
+  }, [loading, summary]);
+
+  const donutBackground = useMemo(() => {
+    if (distribusiTotal <= 0) return "conic-gradient(#dce4e6 0% 100%)";
+
+    const revealUntil = 100 * chartProgress;
+    const gradientParts = [];
+
+    donutSegments.forEach((segment) => {
+      const visibleEnd = Math.min(segment.end, revealUntil);
+      if (visibleEnd > segment.start) {
+        gradientParts.push(
+          `${segment.color} ${segment.start.toFixed(2)}% ${visibleEnd.toFixed(2)}%`
+        );
+      }
+    });
+
+    if (revealUntil < 100) {
+      gradientParts.push(`#dce4e6 ${revealUntil.toFixed(2)}% 100%`);
+    }
+
+    return `conic-gradient(${gradientParts.join(", ")})`;
+  }, [chartProgress, distribusiTotal, donutSegments]);
+
+  function handleDonutMouseMove(event) {
+    if (!distribusiTotal) return;
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const dx = x - cx;
+    const dy = y - cy;
+    const radius = rect.width / 2;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    // Hanya aktifkan tooltip di area cincin donut, bukan di lubang tengah.
+    if (distance < radius * 0.31 || distance > radius) {
+      setHoverInfo(null);
+      return;
+    }
+
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+    const angleFromTop = (angle + 90 + 360) % 360;
+    const percent = (angleFromTop / 360) * 100;
+
+    const activeSegment =
+      donutSegments.find((segment) => percent >= segment.start && percent < segment.end) ||
+      donutSegments[donutSegments.length - 1];
+
+    if (!activeSegment || activeSegment.value === 0) {
+      setHoverInfo(null);
+      return;
+    }
+
+    setHoverInfo({
+      segment: activeSegment,
+      x,
+      y,
+    });
+  }
+
   return (
     <div className="layout">
       <Sidebar />
@@ -68,18 +184,27 @@ export default function DashboardPage() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: "0.9rem", marginBottom: "1.5rem" }}>
           <div className="stat-pill">
+            <span className="stat-pill-icon" aria-hidden="true">
+              <FiBookOpen />
+            </span>
             <span className="hint" style={{ textTransform: "uppercase", letterSpacing: "0.08em" }}>
               Jumlah Mata Kuliah
             </span>
             <strong>{summary?.kpi?.jumlah_mk ?? rows.length}</strong>
           </div>
           <div className="stat-pill">
+            <span className="stat-pill-icon" aria-hidden="true">
+              <FiUsers />
+            </span>
             <span className="hint" style={{ textTransform: "uppercase", letterSpacing: "0.08em" }}>
               Jumlah Mahasiswa
             </span>
             <strong>{summary?.kpi?.jumlah_mahasiswa ?? 0}</strong>
           </div>
           <div className="stat-pill">
+            <span className="stat-pill-icon" aria-hidden="true">
+              <FiAward />
+            </span>
             <span className="hint" style={{ textTransform: "uppercase", letterSpacing: "0.08em" }}>
               Rata Nilai Akhir
             </span>
@@ -92,15 +217,46 @@ export default function DashboardPage() {
         {!loading && summary && (
           <div className="card-soft" style={{ marginBottom: "1rem" }}>
             <h3 style={{ marginTop: 0, marginBottom: "0.75rem" }}>Distribusi Nilai Huruf</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(95px,1fr))", gap: "0.6rem" }}>
-              {Object.entries(summary.distribusi_huruf || {}).map(([k, v]) => (
-                <div key={k} className="card" style={{ padding: "0.8rem 0.95rem" }}>
-                  <div className="hint" style={{ marginBottom: "0.25rem", textTransform: "uppercase" }}>
-                    {k}
+            <div className="distribusi-layout">
+              <div className="distribusi-chart-wrap">
+                <div
+                  className="distribusi-donut"
+                  style={{ background: donutBackground }}
+                  onMouseMove={handleDonutMouseMove}
+                  onMouseLeave={() => setHoverInfo(null)}
+                >
+                  <div className="distribusi-donut-center">
+                    <span className="hint">Total Nilai</span>
+                    <strong>{distribusiTotal}</strong>
+                    {distribusiTotal === 0 && <small>Belum ada data</small>}
                   </div>
-                  <div style={{ fontWeight: 800, fontSize: "1.2rem" }}>{v}</div>
+                  {hoverInfo && (
+                    <div
+                      className="distribusi-tooltip"
+                      style={{ left: `${hoverInfo.x}px`, top: `${hoverInfo.y}px` }}
+                    >
+                      <strong>{hoverInfo.segment.huruf}</strong>
+                      <span>
+                        {hoverInfo.segment.value} mahasiswa ({hoverInfo.segment.percent.toFixed(1)}%)
+                      </span>
+                    </div>
+                  )}
                 </div>
-              ))}
+              </div>
+              <div className="distribusi-summary-list">
+                {donutSegments.map((item) => (
+                  <div key={item.huruf} className="distribusi-summary-item">
+                    <div className="distribusi-summary-left">
+                      <span className="distribusi-dot" style={{ backgroundColor: item.color }} />
+                      <span className="distribusi-grade">{item.huruf}</span>
+                    </div>
+                    <div className="distribusi-summary-right">
+                      <strong>{item.value}</strong>
+                      <span className="hint">{item.percent.toFixed(1)}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -113,13 +269,48 @@ export default function DashboardPage() {
               <table>
                 <thead>
                   <tr>
-                    <th>Kode MK</th>
-                    <th>Nama MK</th>
-                    <th>Jumlah Mahasiswa</th>
-                    <th>Status Evaluasi</th>
-                    <th>Progress</th>
-                    <th>Rata Akhir</th>
-                    <th style={{ minWidth: 220 }}>Aksi</th>
+                    <th>
+                      <span className="table-head-inline">
+                        <span className="table-head-icon"><FiHash /></span>
+                        Kode MK
+                      </span>
+                    </th>
+                    <th>
+                      <span className="table-head-inline">
+                        <span className="table-head-icon"><FiType /></span>
+                        Nama MK
+                      </span>
+                    </th>
+                    <th>
+                      <span className="table-head-inline">
+                        <span className="table-head-icon"><FiUsers /></span>
+                        Jumlah Mahasiswa
+                      </span>
+                    </th>
+                    <th>
+                      <span className="table-head-inline">
+                        <span className="table-head-icon"><FiActivity /></span>
+                        Status Evaluasi
+                      </span>
+                    </th>
+                    <th>
+                      <span className="table-head-inline">
+                        <span className="table-head-icon"><FiPercent /></span>
+                        Progress
+                      </span>
+                    </th>
+                    <th>
+                      <span className="table-head-inline">
+                        <span className="table-head-icon"><FiAward /></span>
+                        Rata Akhir
+                      </span>
+                    </th>
+                    <th style={{ minWidth: 220 }}>
+                      <span className="table-head-inline">
+                        <span className="table-head-icon"><FiSettings /></span>
+                        Aksi
+                      </span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -143,23 +334,34 @@ export default function DashboardPage() {
                         })()}
                       </td>
                       <td>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem" }}>
+                        <div className="aksi-inline">
                           <Link
                             to={`/matakuliah/${r.id}/nilai`}
-                            className="btn btn-ghost"
+                            className="btn btn-ghost btn-icon-only"
                             style={{ fontSize: "0.85rem", textDecoration: "none" }}
+                            aria-label="Kelola"
+                            title="Kelola"
                           >
-                            Kelola
+                            <FiSettings />
                           </Link>
                           <Link
                             to={`/matakuliah/${r.id}/edit`}
-                            className="btn btn-ghost"
+                            className="btn btn-ghost btn-icon-only"
                             style={{ fontSize: "0.85rem", textDecoration: "none" }}
+                            aria-label="Edit MK"
+                            title="Edit MK"
                           >
-                            Edit MK
+                            <FiEdit2 />
                           </Link>
-                          <button type="button" className="btn btn-danger" style={{ fontSize: "0.85rem" }} onClick={() => hapus(r.id)}>
-                            Hapus
+                          <button
+                            type="button"
+                            className="btn btn-danger btn-icon-only"
+                            style={{ fontSize: "0.85rem" }}
+                            onClick={() => hapus(r.id)}
+                            aria-label="Hapus"
+                            title="Hapus"
+                          >
+                            <FiTrash2 />
                           </button>
                         </div>
                       </td>

@@ -1,4 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { FiBarChart2, FiBookOpen, FiEdit3, FiHome, FiLogOut, FiPlusCircle } from "react-icons/fi";
 
 /** Menyediakan navigasi primer sidebar dengan status aktif untuk orientasi pengguna. */
 export default function Sidebar({ mkId, kodeMk }) {
@@ -24,22 +25,29 @@ export default function Sidebar({ mkId, kodeMk }) {
         </div>
       </Link>
       <nav className="sidebar-nav">
-        <SidebarLink to="/" end>
+        <SidebarLink to="/" end icon={FiHome}>
           Dashboard
         </SidebarLink>
-        <SidebarLink to="/matakuliah/new">Buat mata kuliah</SidebarLink>
+        <SidebarLink to="/matakuliah/new" icon={FiPlusCircle}>
+          Buat mata kuliah
+        </SidebarLink>
         {mkBase && kodeMk && (
           <>
             <div className="sidebar-section-label">
               {kodeMk}
             </div>
-            <SidebarLink to={`${mkBase}/nilai`}>Input nilai</SidebarLink>
-            <SidebarLink to={`${mkBase}/hasil`}>Hasil evaluasi</SidebarLink>
+            <SidebarLink to={`${mkBase}/nilai`} icon={FiEdit3}>
+              Input nilai
+            </SidebarLink>
+            <SidebarLink to={`${mkBase}/hasil`} icon={FiBarChart2}>
+              Hasil evaluasi
+            </SidebarLink>
           </>
         )}
       </nav>
       <div className="sidebar-actions">
         <button type="button" className="btn btn-ghost" style={{ width: "100%" }} onClick={handleLogout}>
+          <FiLogOut aria-hidden="true" style={{ marginRight: "0.5rem", verticalAlign: "middle" }} />
           Logout
         </button>
       </div>
@@ -47,7 +55,7 @@ export default function Sidebar({ mkId, kodeMk }) {
   );
 }
 
-function SidebarLink({ to, end, children }) {
+function SidebarLink({ to, end, icon: Icon, children }) {
   return (
     <NavLink
       to={to}
@@ -64,7 +72,10 @@ function SidebarLink({ to, end, children }) {
         textDecoration: "none",
       })}
     >
-      {children}
+      <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+        {Icon && <Icon aria-hidden="true" />}
+        <span>{children}</span>
+      </span>
     </NavLink>
   );
 }

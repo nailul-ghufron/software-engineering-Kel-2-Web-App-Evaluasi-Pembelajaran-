@@ -1,5 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import Sidebar from "../components/Sidebar.jsx";
 import ExportButton from "../components/ExportButton.jsx";
 import { downloadExcel, fetchNilaiSet } from "../services/api.js";
@@ -48,6 +57,46 @@ export default function HasilEvaluasiPage() {
           .map((x) => x.nilai_akhir)
           .filter((x) => x != null)
           .reduce((a, b, _, arr) => a + Number(b) / arr.length, 0);
+  const nilaiAkhirList = useMemo(
+    () =>
+      items
+        .map((x) => x.nilai_akhir)
+        .filter((x) => x != null && Number.isFinite(Number(x)))
+        .map((x) => Number(x)),
+    [items]
+  );
+
+  const histogramData = useMemo(() => {
+    const bins = Array.from({ length: 10 }, (_, i) => {
+      const start = i * 10;
+      const end = i === 9 ? 100 : start + 9;
+      return {
+        range: `${start}-${end}`,
+        jumlah: 0,
+      };
+    });
+
+    nilaiAkhirList.forEach((nilai) => {
+      const clamped = Math.max(0, Math.min(100, nilai));
+      const idx = Math.min(9, Math.floor(clamped / 10));
+      bins[idx].jumlah += 1;
+    });
+
+    return bins;
+  }, [nilaiAkhirList]);
+
+  const gradeDistributionData = useMemo(() => {
+    const gradeMap = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+    items.forEach((x) => {
+      const huruf = String(x.nilai_huruf || "").toUpperCase();
+      if (Object.prototype.hasOwnProperty.call(gradeMap, huruf)) {
+        gradeMap[huruf] += 1;
+      }
+    });
+    return Object.entries(gradeMap).map(([huruf, jumlah]) => ({ huruf, jumlah }));
+  }, [items]);
+  const hasHistogramData = histogramData.some((x) => x.jumlah > 0);
+  const hasGradeData = gradeDistributionData.some((x) => x.jumlah > 0);
 
   return (
     <div className="layout">
@@ -70,6 +119,52 @@ export default function HasilEvaluasiPage() {
             )}
           </div>
           <ExportButton loading={xBusy} onClick={exportXlsx} />
+        </div>
+
+        <div className="card-soft hasil-chart-section">
+          <div className="hasil-chart-grid">
+            <div className="hasil-chart-card">
+              <h3 className="hasil-chart-title">Sebaran Nilai Akhir</h3>
+              {loading ? (
+                <p className="hint">Menyiapkan grafik...</p>
+              ) : hasHistogramData ? (
+                <div className="hasil-chart-canvas" aria-label="Histogram nilai akhir">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={histogramData} margin={{ top: 8, right: 8, left: -16, bottom: 4 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(89, 96, 99, 0.18)" />
+                      <XAxis dataKey="range" tick={{ fontSize: 11, fill: "var(--muted)" }} />
+                      <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "var(--muted)" }} />
+                      <Tooltip formatter={(value) => [`${value} mahasiswa`, "Jumlah"]} />
+                      <Bar dataKey="jumlah" fill="var(--primary)" radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="hasil-chart-empty">Belum ada nilai akhir untuk divisualisasikan.</div>
+              )}
+            </div>
+
+            <div className="hasil-chart-card">
+              <h3 className="hasil-chart-title">Distribusi Nilai Huruf</h3>
+              {loading ? (
+                <p className="hint">Menyiapkan grafik...</p>
+              ) : hasGradeData ? (
+                <div className="hasil-chart-canvas" aria-label="Bar chart distribusi nilai huruf">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={gradeDistributionData} margin={{ top: 8, right: 8, left: -16, bottom: 4 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(89, 96, 99, 0.18)" />
+                      <XAxis dataKey="huruf" tick={{ fontSize: 11, fill: "var(--muted)" }} />
+                      <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "var(--muted)" }} />
+                      <Tooltip formatter={(value) => [`${value} mahasiswa`, "Jumlah"]} />
+                      <Bar dataKey="jumlah" fill="var(--secondary)" radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="hasil-chart-empty">Belum ada nilai huruf untuk divisualisasikan.</div>
+              )}
+            </div>
+          </div>
         </div>
 
         <div style={{ marginTop: "1rem" }} className="card-soft">

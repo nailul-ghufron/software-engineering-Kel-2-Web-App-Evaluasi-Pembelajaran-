@@ -138,6 +138,23 @@ th {
   text-transform: uppercase;
 }
 
+th .table-head-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+th .table-head-icon {
+  display: inline-flex;
+  transform: translateY(-0.5px);
+}
+
+th .table-head-icon svg {
+  width: 0.86rem;
+  height: 0.86rem;
+}
+
 tbody tr {
   background: var(--surface-card);
   box-shadow: 0 1px 0 rgba(172, 179, 182, 0.18);
@@ -220,11 +237,54 @@ tbody tr td:last-child {
   color: var(--text);
 }
 
+.password-input-wrap {
+  position: relative;
+}
+
+.password-input-wrap input {
+  width: 100%;
+  padding-right: 2.8rem;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 0.45rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+}
+
 .field input:focus {
   outline: none;
   background: var(--surface-card);
   border-color: rgba(63, 97, 137, 0.35);
   box-shadow: 0 0 0 2px rgba(63, 97, 137, 0.2);
+}
+
+.password-toggle-btn:hover {
+  background: rgba(63, 97, 137, 0.08);
+}
+
+.password-toggle-btn:focus-visible {
+  outline: none;
+  background: rgba(63, 97, 137, 0.12);
+  box-shadow: 0 0 0 2px rgba(63, 97, 137, 0.2);
+}
+
+.password-toggle-btn svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: currentColor;
 }
 
 .error-text {
@@ -247,9 +307,65 @@ tbody tr td:last-child {
   margin-bottom: 1.75rem;
 }
 
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(44, 52, 54, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.modal-dialog {
+  width: min(460px, 100%);
+  background: var(--surface-card);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-floating);
+  padding: 1.15rem 1.2rem 1.2rem;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.95rem;
+}
+
+.modal-close {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: var(--surface-low);
+  color: var(--muted);
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.modal-close:hover {
+  background: var(--surface-highest);
+}
+
+.modal-close:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.modal-body {
+  margin: 0;
+}
+
 .stat-pill {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.8rem;
   background: var(--surface-card);
   border-radius: var(--radius-lg);
@@ -257,10 +373,204 @@ tbody tr td:last-child {
   box-shadow: var(--shadow-ambient);
 }
 
+.stat-pill-icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  background: rgba(63, 97, 137, 0.14);
+  flex-shrink: 0;
+}
+
+.stat-pill-icon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
 .stat-pill strong {
   font-size: 2rem;
   line-height: 1;
   letter-spacing: -0.04em;
+}
+
+.distribusi-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(260px, 1fr);
+  gap: 1rem;
+  align-items: center;
+}
+
+.distribusi-chart-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+}
+
+.distribusi-donut {
+  width: clamp(190px, 24vw, 250px);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 1px var(--outline);
+  position: relative;
+  cursor: crosshair;
+}
+
+.distribusi-donut-center {
+  width: 62%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: var(--surface-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.15rem;
+  box-shadow: 0 0 0 1px var(--outline);
+}
+
+.distribusi-donut-center strong {
+  font-size: 1.9rem;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.distribusi-donut-center small {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.distribusi-summary-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.distribusi-summary-item {
+  background: var(--surface-card);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.distribusi-summary-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.distribusi-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.distribusi-grade {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.distribusi-summary-right {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.aksi-inline {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.btn-icon-only {
+  width: 2.35rem;
+  height: 2.35rem;
+  padding: 0;
+}
+
+.btn-icon-only svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.distribusi-tooltip {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 10px));
+  background: #1f2937;
+  color: #f8fafb;
+  border-radius: 10px;
+  padding: 0.4rem 0.55rem;
+  min-width: 110px;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+}
+
+.distribusi-tooltip strong {
+  font-size: 0.8rem;
+  line-height: 1.1;
+}
+
+.distribusi-tooltip span {
+  font-size: 0.72rem;
+  line-height: 1.2;
+  opacity: 0.95;
+}
+
+.hasil-chart-section {
+  margin-top: 1rem;
+}
+
+.hasil-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 0.9rem;
+}
+
+.hasil-chart-card {
+  background: var(--surface-card);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-md);
+  padding: 0.85rem;
+}
+
+.hasil-chart-title {
+  margin: 0 0 0.55rem;
+  font-size: 0.95rem;
+}
+
+.hasil-chart-canvas {
+  width: 100%;
+  height: 240px;
+}
+
+.hasil-chart-empty {
+  height: 240px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-low);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.8rem;
+  font-size: 0.88rem;
 }
 
 .sidebar {
@@ -375,6 +685,10 @@ tbody tr td:last-child {
     margin-bottom: 1.2rem;
   }
 
+  .modal-dialog {
+    padding: 1rem;
+  }
+
   th,
   td {
     padding: 0.6rem 0.65rem;
@@ -389,6 +703,24 @@ tbody tr td:last-child {
   .nilai-input {
     width: 72px;
     padding: 0.44rem;
+  }
+
+  .distribusi-layout {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .distribusi-donut {
+    width: min(210px, 72vw);
+  }
+
+  .hasil-chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hasil-chart-canvas,
+  .hasil-chart-empty {
+    height: 220px;
   }
 }
 
@@ -415,5 +747,17 @@ tbody tr td:last-child {
 
   .field input {
     padding: 0.64rem 0.72rem;
+  }
+
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0.6rem;
+  }
+
+  .modal-dialog {
+    width: 100%;
+    max-height: 86vh;
+    overflow-y: auto;
+    border-radius: var(--radius-md);
   }
 }
